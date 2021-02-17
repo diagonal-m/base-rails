@@ -1,19 +1,16 @@
-FROM ruby:2.6
-
-ENV LANG C.UTF-8
+FROM ruby:2.7
 
 RUN curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - \
-    && echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list \
-    && apt-get update -qq \
-    && apt-get install -y essential nodejs yarn
+    && echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list
 
-RUN mkdir /app
+RUN apt-get update -qq && apt-get install -y nodejs postgresql-client yarn
 
-WORKDIR /app
+RUN mkdir /app_name
+ENV APP_ROOT /app_name
+WORKDIR $APP_ROOT
 
-COPY Gemfile /app/Gemfile
-COPY Gemfile.lock /app/Gemfile.lock
+ADD ./Gemfile $APP_ROOT/Gemfile
+ADD ./Gemfile.lock $APP_ROOT/Gemfile.lock
 
 RUN bundle install
-
-COPY . /app
+ADD . $APP_ROOT
